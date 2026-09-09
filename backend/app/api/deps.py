@@ -113,3 +113,38 @@ require_team = require_roles(
     "GRAPHIC_DESIGNER",
     "VIDEO_EDITOR",
 )
+
+
+async def get_authorized_company(
+    company_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """FastAPI route dependency ensuring current user is authorized to access company_id.
+
+    Raises:
+        HTTPException(404): If company does not exist or is inactive.
+        HTTPException(403): If user does not have membership access.
+    """
+    from app.services.company_service import CompanyService
+    return await CompanyService.get_authorized_company(
+        db=db,
+        company_id=company_id,
+        user=current_user,
+    )
+
+
+async def require_company_access(
+    company_id: uuid.UUID,
+    user: User,
+    db: AsyncSession,
+) -> bool:
+    """Helper verifying if user has access to company_id, raising 403/404 if not."""
+    from app.services.company_service import CompanyService
+    await CompanyService.get_authorized_company(
+        db=db,
+        company_id=company_id,
+        user=user,
+    )
+    return True
+

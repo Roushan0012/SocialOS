@@ -5,9 +5,9 @@ from app.core.database import Base, check_database_health
 
 
 def test_all_tables_registered():
-    """Verify all 15 core tables (14 domain entities + auth_sessions) are defined in Base.metadata."""
-    assert len(Base.metadata.tables) == 15, (
-        f"Expected 15 tables in Base.metadata, found {len(Base.metadata.tables)}: {list(Base.metadata.tables.keys())}"
+    """Verify all 16 core tables (14 domain entities + auth_sessions + company_memberships) are defined in Base.metadata."""
+    assert len(Base.metadata.tables) == 16, (
+        f"Expected 16 tables in Base.metadata, found {len(Base.metadata.tables)}: {list(Base.metadata.tables.keys())}"
     )
 
 

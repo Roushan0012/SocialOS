@@ -198,6 +198,16 @@ class AuthService:
                 revoked_any = True
                 if not user_id:
                     user_id = session.user_id
+        elif user_id:
+            stmt = select(AuthSession).where(
+                AuthSession.user_id == user_id,
+                AuthSession.revoked_at.is_(None),
+            )
+            result = await db.execute(stmt)
+            active_sessions = result.scalars().all()
+            for s in active_sessions:
+                s.revoked_at = now
+                revoked_any = True
 
         if user_id:
             audit_log = ActivityLog(

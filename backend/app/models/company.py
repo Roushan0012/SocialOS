@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from app.models.social_account import SocialAccount
     from app.models.post import Post
     from app.models.task import Task
+    from app.models.company_membership import CompanyMembership
 
 
 class Company(Base, TimestampMixin):
@@ -59,6 +60,11 @@ class Company(Base, TimestampMixin):
     )
     tasks: Mapped[List["Task"]] = relationship(
         "Task",
+        back_populates="company",
+        cascade="all, delete-orphan",
+    )
+    memberships: Mapped[List["CompanyMembership"]] = relationship(
+        "CompanyMembership",
         back_populates="company",
         cascade="all, delete-orphan",
     )

@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from app.models.notification import Notification
     from app.models.activity_log import ActivityLog
     from app.models.auth_session import AuthSession
+    from app.models.company_membership import CompanyMembership
 
 
 class User(Base, TimestampMixin):
@@ -93,6 +94,11 @@ class User(Base, TimestampMixin):
     )
     auth_sessions: Mapped[List["AuthSession"]] = relationship(
         "AuthSession",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    company_memberships: Mapped[List["CompanyMembership"]] = relationship(
+        "CompanyMembership",
         back_populates="user",
         cascade="all, delete-orphan",
     )
