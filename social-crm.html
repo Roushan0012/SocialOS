@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SocialOS — Brand Command Center</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a22;
+    --card: #1e2330;
+    --border: #2a2f3e;
+    --border-light: #343b4f;
+    --text: #e8eaf0;
+    --muted: #7a80a0;
+    --dim: #4a5170;
+
+    --rupeeq: #00c48c;
+    --qwikpay: #5b8def;
+    --qfit: #ff6b6b;
+    --codexa: #f5a623;
+
+    --radius: 10px;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 13px;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 18px 16px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo .wordmark {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .sidebar-logo .tagline {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .sidebar-section { padding: 12px 10px 4px; }
+  .sidebar-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 0 6px;
+    margin-bottom: 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 12.5px;
+    font-weight: 500;
+    transition: all 0.15s;
+    margin-bottom: 1px;
+  }
+  .nav-item:hover { background: var(--card); color: var(--text); }
+  .nav-item.active { background: rgba(255,255,255,0.06); color: var(--text); }
+  .nav-item .nav-icon { width: 16px; text-align: center; font-size: 14px; }
+
+  .brand-pill {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all 0.15s;
+    margin-bottom: 1px;
+  }
+  .brand-pill:hover { background: var(--card); color: var(--text); }
+  .brand-pill.active { color: var(--text); background: rgba(255,255,255,0.04); }
+  .brand-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px 10px;
+    border-top: 1px solid var(--border);
+  }
+  .user-badge {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+  }
+  .user-badge:hover { background: var(--card); }
+  .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00c48c, #5b8def);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .user-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .user-role { font-size: 10px; color: var(--muted); }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .topbar {
+    height: 52px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 12px;
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .topbar-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+  }
+  .topbar-actions { display: flex; gap: 8px; align-items: center; }
+
+  .btn {
+    padding: 6px 14px;
+    border-radius: 7px;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--card); color: var(--text); }
+  .btn-primary {
+    background: var(--rupeeq);
+    color: #001a11;
+    font-weight: 600;
+  }
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-sm { padding: 4px 10px; font-size: 11px; }
+
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  /* ── VIEWS ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── DASHBOARD ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .stat-brand-bar {
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+    margin-bottom: 10px;
+  }
+  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .stat-value { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--text); }
+  .stat-sub { font-size: 10px; color: var(--muted); margin-top: 3px; }
+  .stat-up { color: #00c48c; }
+  .stat-down { color: #ff6b6b; }
+
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 16px;
+  }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .panel-body { padding: 0; }
+
+  /* post list */
+  .post-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .post-row:last-child { border-bottom: none; }
+  .post-row:hover { background: rgba(255,255,255,0.03); }
+  .post-brand-badge {
+    width: 3px;
+    border-radius: 2px;
+    align-self: stretch;
+    flex-shrink: 0;
+  }
+  .post-info { flex: 1; min-width: 0; }
+  .post-title {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .post-meta { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .status-pill {
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .s-draft { background: rgba(122,128,160,0.15); color: var(--muted); }
+  .s-review { background: rgba(245,166,35,0.15); color: #f5a623; }
+  .s-scheduled { background: rgba(91,141,239,0.15); color: #5b8def; }
+  .s-live { background: rgba(0,196,140,0.15); color: #00c48c; }
+
+  /* channels widget */
+  .channel-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .channel-item:last-child { border-bottom: none; }
+  .ch-icon {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .ch-ig { background: rgba(225,48,108,0.15); }
+  .ch-li { background: rgba(0,119,181,0.15); }
+  .ch-yt { background: rgba(255,0,0,0.15); }
+  .ch-fb { background: rgba(24,119,242,0.15); }
+  .ch-name { font-size: 12px; font-weight: 500; color: var(--text); flex: 1; }
+  .ch-count { font-size: 10px; color: var(--muted); }
+  .ch-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--rupeeq); }
+
+  /* ── CONTENT / BROADCAST ── */
+  .broadcast-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .broadcast-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+  .form-label { font-size: 11px; color: var(--muted); font-weight: 500; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .form-row { margin-bottom: 14px; }
+  textarea.form-input, input.form-input, select.form-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 13px;
+    padding: 10px 12px;
+    outline: none;
+    resize: none;
+    transition: border-color 0.15s;
+  }
+  textarea.form-input:focus, input.form-input:focus { border-color: var(--border-light); }
+  textarea.form-input { min-height: 90px; }
+
+  .channel-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .ch-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.12s;
+    user-select: none;
+  }
+  .ch-toggle:hover { border-color: var(--border-light); }
+  .ch-toggle.selected { border-color: #5b8def; background: rgba(91,141,239,0.06); }
+  .ch-toggle .ch-emoji { font-size: 15px; }
+  .ch-toggle .ch-label { font-size: 11.5px; color: var(--muted); flex: 1; }
+  .ch-toggle.selected .ch-label { color: var(--text); }
+  .ch-check {
+    width: 15px; height: 15px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border-light);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 9px;
+  }
+  .ch-toggle.selected .ch-check {
+    background: #5b8def;
+    border-color: #5b8def;
+    color: #fff;
+  }
+
+  .broadcast-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  /* ── PIPELINE / KANBAN ── */
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    align-items: start;
+  }
+  .kanban-col {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .kanban-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .kanban-col-title { font-size: 11.5px; font-weight: 600; color: var(--text); }
+  .kanban-count {
+    font-size: 10px;
+    background: var(--surface);
+    color: var(--muted);
+    padding: 1px 7px;
+    border-radius: 20px;
+  }
+  .kanban-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .kanban-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color 0.12s;
+  }
+  .kanban-card:hover { border-color: var(--border-light); }
+  .kc-brand {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 4px;
+  }
+  .kc-title { font-size: 12px; color: var(--text); font-weight: 500; line-height: 1.4; }
+  .kc-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 7px; }
+  .kc-channels { font-size: 10px; color: var(--muted); }
+  .kc-date { font-size: 10px; color: var(--dim); }
+
+  /* ── ANALYTICS ── */
+  .analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 16px;
+  }
+  .brand-stat-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .brand-stat-row:last-child { border-bottom: none; }
+  .bs-name { font-size: 12px; font-weight: 500; color: var(--text); width: 80px; flex-shrink: 0; }
+  .bs-bar-wrap { flex: 1; background: var(--surface); border-radius: 4px; height: 5px; overflow: hidden; }
+  .bs-bar { height: 100%; border-radius: 4px; }
+  .bs-val { font-size: 11px; color: var(--muted); width: 50px; text-align: right; flex-shrink: 0; }
+
+  .mini-chart {
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    height: 80px;
+  }
+  .bar-item {
+    flex: 1;
+    border-radius: 3px 3px 0 0;
+    transition: opacity 0.2s;
+    cursor: pointer;
+  }
+  .bar-item:hover { opacity: 0.7; }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 18px;
+  }
+  .tab {
+    padding: 8px 14px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.12s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); border-bottom-color: var(--rupeeq); }
+
+  /* ── TEAM ── */
+  .team-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .team-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .team-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .tm-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .tm-role { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .tm-tasks { font-size: 11px; color: var(--muted); margin-top: 8px; }
+  .tm-task-item {
+    display: flex; gap: 6px; align-items: center;
+    margin-top: 5px;
+    font-size: 11px; color: var(--text);
+  }
+  .tm-task-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* notification dot */
+  .notif-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #ff6b6b;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="wordmark">SocialOS</div>
+    <div class="tagline">Brand Command Center</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Main</div>
+    <div class="nav-item active" onclick="switchView('dashboard', this)">
+      <span class="nav-icon">⊞</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="switchView('broadcast', this)">
+      <span class="nav-icon">📡</span> Broadcast Post
+    </div>
+    <div class="nav-item" onclick="switchView('pipeline', this)">
+      <span class="nav-icon">⋮⋮</span> Content Pipeline
+    </div>
+    <div class="nav-item" onclick="switchView('analytics', this)">
+      <span class="nav-icon">◈</span> Analytics
+    </div>
+    <div class="nav-item" onclick="switchView('team', this)">
+      <span class="nav-icon">◉</span> Team
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Brands</div>
+    <div class="brand-pill active" onclick="filterBrand('rupeeq', this)">
+      <span class="brand-dot" style="background:var(--rupeeq)"></span>
+      RupeeQ
+    </div>
+    <div class="brand-pill" onclick="filterBrand('qwikpay', this)">
+      <span class="brand-dot" style="background:var(--qwikpay)"></span>
+      Qwikpay Matrix
+    </div>
+    <div class="brand-pill" onclick="filterBrand('qfit', this)">
+      <span class="brand-dot" style="background:var(--qfit)"></span>
+      QFit
+    </div>
+    <div class="brand-pill" onclick="filterBrand('codexa', this)">
+      <span class="brand-dot" style="background:var(--codexa)"></span>
+      CodexaCraft
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-badge">
+      <div class="avatar">PR</div>
+      <div>
+        <div class="user-name">Priyanshu Raj</div>
+        <div class="user-role">Social Media Manager</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-title" id="page-title">Dashboard</div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost btn-sm">🔔</button>
+      <button class="btn btn-ghost btn-sm">⚙</button>
+      <button class="btn btn-primary btn-sm" onclick="switchView('broadcast', document.querySelector('[onclick*=broadcast]'))">+ New Post</button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ── DASHBOARD VIEW ── -->
+    <div id="view-dashboard" class="view active">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-brand-bar" style="background:var(--rupeeq)"></div>
+          <div class="stat-label">Total Posts (This Month)</div>
+          <div class="stat-value">84</div>
+          <div class="stat-sub"><span class="stat-up">↑ 12%</span> vs last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-brand-bar" style="background:var(--qwikpay)"></div>
+          <div class="stat-label">Accounts Active</div>
+          <div class="stat-value">13</div>
+          <div class="stat-sub">4 brands · 5 channels</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-brand-bar" style="background:var(--qfit)"></div>
+          <div class="stat-label">Scheduled (Pending)</div>
+          <div class="stat-value">11</div>
+          <div class="stat-sub"><span class="stat-up">3 today</span> · 8 this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-brand-bar" style="background:var(--codexa)"></div>
+          <div class="stat-label">Total Impressions</div>
+          <div class="stat-value">1.4L</div>
+          <div class="stat-sub"><span class="stat-up">↑ 34%</span> from last month</div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div>
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Recent Content</span>
+              <button class="btn btn-ghost btn-sm" onclick="switchView('pipeline', document.querySelector('[onclick*=pipeline]'))">View all</button>
+            </div>
+            <div class="panel-body">
+              <div class="post-row">
+                <div class="post-brand-badge" style="background:var(--rupeeq)"></div>
+                <div class="post-info">
+                  <div class="post-title">5 Free Tools Every Marketer Should Know</div>
+                  <div class="post-meta">RupeeQ · Instagram, LinkedIn · Today 3pm</div>
+                </div>
+                <span class="status-pill s-scheduled">Scheduled</span>
+              </div>
+              <div class="post-row">
+                <div class="post-brand-badge" style="background:var(--codexa)"></div>
+                <div class="post-info">
+                  <div class="post-title">Cloud Calling Feature Demo Reel</div>
+                  <div class="post-meta">CodexaCraft · YouTube, Instagram · Tomorrow</div>
+                </div>
+                <span class="status-pill s-review">In Review</span>
+              </div>
+              <div class="post-row">
+                <div class="post-brand-badge" style="background:var(--qfit)"></div>
+                <div class="post-info">
+                  <div class="post-title">Morning Workout — 5 min no equipment</div>
+                  <div class="post-meta">QFit · Instagram Reels, YouTube Shorts</div>
+                </div>
+                <span class="status-pill s-draft">Draft</span>
+              </div>
+              <div class="post-row">
+                <div class="post-brand-badge" style="background:var(--rupeeq)"></div>
+                <div class="post-info">
+                  <div class="post-title">15 Free Digital Marketing Certifications</div>
+                  <div class="post-meta">RupeeQ · LinkedIn · Yesterday</div>
+                </div>
+                <span class="status-pill s-live">Live ✓</span>
+              </div>
+              <div class="post-row">
+                <div class="post-brand-badge" style="background:var(--qwikpay)"></div>
+                <div class="post-info">
+                  <div class="post-title">CIBIL Score Kya Hota Hai? #LearnWithQwik</div>
+                  <div class="post-meta">Qwikpay Matrix · Instagram, Facebook</div>
+                </div>
+                <span class="status-pill s-live">Live ✓</span>
+              </div>
+              <div class="post-row">
+                <div class="post-brand-badge" style="background:var(--qfit)"></div>
+                <div class="post-info">
+                  <div class="post-title">QFit Lead Tracker — July Update</div>
+                  <div class="post-meta">QFit · Internal · 180 leads processed</div>
+                </div>
+                <span class="status-pill s-live">Done ✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Active Channels</span>
+              <span style="font-size:10px;color:var(--muted)">13 accounts</span>
+            </div>
+            <div class="panel-body">
+              <div class="channel-item">
+                <div class="ch-icon ch-ig">📸</div>
+                <div>
+                  <div class="ch-name">Instagram</div>
+                  <div class="ch-count">4 accounts · RupeeQ, QFit, Qwik, Codexa</div>
+                </div>
+                <div class="ch-dot"></div>
+              </div>
+              <div class="channel-item">
+                <div class="ch-icon ch-li">💼</div>
+                <div>
+                  <div class="ch-name">LinkedIn</div>
+                  <div class="ch-count">4 accounts + Priyanshu Personal</div>
+                </div>
+                <div class="ch-dot" style="background:var(--qwikpay)"></div>
+              </div>
+              <div class="channel-item">
+                <div class="ch-icon ch-yt">▶</div>
+                <div>
+                  <div class="ch-name">YouTube</div>
+                  <div class="ch-count">2 channels · RupeeQ, CodexaCraft</div>
+                </div>
+                <div class="ch-dot" style="background:var(--codexa)"></div>
+              </div>
+              <div class="channel-item">
+                <div class="ch-icon ch-fb">👥</div>
+                <div>
+                  <div class="ch-name">Facebook</div>
+                  <div class="ch-count">3 pages · All brands</div>
+                </div>
+                <div class="ch-dot" style="background:var(--qfit)"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Today's Queue</span></div>
+            <div class="panel-body">
+              <div class="post-row" style="padding:8px 14px">
+                <div class="post-brand-badge" style="background:var(--rupeeq)"></div>
+                <div class="post-info">
+                  <div class="post-title">RupeeQ IG Carousel</div>
+                  <div class="post-meta">3:00 PM</div>
+                </div>
+                <span class="status-pill s-scheduled">Soon</span>
+              </div>
+              <div class="post-row" style="padding:8px 14px">
+                <div class="post-brand-badge" style="background:var(--qwikpay)"></div>
+                <div class="post-info">
+                  <div class="post-title">Qwikpay LinkedIn</div>
+                  <div class="post-meta">6:00 PM</div>
+                </div>
+                <span class="status-pill s-scheduled">Soon</span>
+              </div>
+              <div class="post-row" style="padding:8px 14px">
+                <div class="post-brand-badge" style="background:var(--qfit)"></div>
+                <div class="post-info">
+                  <div class="post-title">QFit Reels Draft</div>
+                  <div class="post-meta">Needs approval</div>
+                </div>
+                <div class="notif-dot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BROADCAST VIEW ── -->
+    <div id="view-broadcast" class="view">
+      <div style="max-width:740px">
+        <div style="margin-bottom:16px">
+          <div style="font-family:var(--font-display);font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px">Broadcast Post</div>
+          <div style="font-size:12px;color:var(--muted)">Ek post likho → sabhi channels select karo → ek click mein post karo</div>
+        </div>
+
+        <div class="broadcast-box">
+          <div class="broadcast-title">📝 Content</div>
+
+          <div class="form-row">
+            <div class="form-label">Brand</div>
+            <select class="form-input" style="width:auto;min-width:180px">
+              <option>RupeeQ</option>
+              <option>Qwikpay Matrix</option>
+              <option>QFit</option>
+              <option>CodexaCraft</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-label">Caption / Post Text</div>
+            <textarea class="form-input" placeholder="Apna post yahan likho... Hashtags, emojis sab dal sakte ho 🚀"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-label">Media Attach karo</div>
+            <div style="border:1.5px dashed var(--border-light);border-radius:7px;padding:24px;text-align:center;color:var(--muted);cursor:pointer;font-size:12px;">
+              📎 &nbsp; Image ya Video drop karo yahan &nbsp;·&nbsp; ya click karke upload karo
+            </div>
+          </div>
+        </div>
+
+        <div class="broadcast-box">
+          <div class="broadcast-title">📡 Channels Select Karo</div>
+          <div class="channel-grid" id="channel-grid">
+            <div class="ch-toggle selected" onclick="toggleChannel(this)">
+              <span class="ch-emoji">📸</span>
+              <span class="ch-label">RupeeQ Instagram</span>
+              <div class="ch-check">✓</div>
+            </div>
+            <div class="ch-toggle selected" onclick="toggleChannel(this)">
+              <span class="ch-emoji">💼</span>
+              <span class="ch-label">RupeeQ LinkedIn</span>
+              <div class="ch-check">✓</div>
+            </div>
+            <div class="ch-toggle" onclick="toggleChannel(this)">
+              <span class="ch-emoji">📸</span>
+              <span class="ch-label">Qwikpay Instagram</span>
+              <div class="ch-check"></div>
+            </div>
+            <div class="ch-toggle" onclick="toggleChannel(this)">
+              <span class="ch-emoji">💼</span>
+              <span class="ch-label">Qwikpay LinkedIn</span>
+              <div class="ch-check"></div>
+            </div>
+            <div class="ch-toggle" onclick="toggleChannel(this)">
+              <span class="ch-emoji">📸</span>
+              <span class="ch-label">QFit Instagram</span>
+              <div class="ch-check"></div>
+            </div>
+            <div class="ch-toggle" onclick="toggleChannel(this)">
+              <span class="ch-emoji">▶</span>
+              <span class="ch-label">QFit YouTube</span>
+              <div class="ch-check"></div>
+            </div>
+            <div class="ch-toggle" onclick="toggleChannel(this)">
+              <span class="ch-emoji">📸</span>
+              <span class="ch-label">CodexaCraft Instagram</span>
+              <div class="ch-check"></div>
+            </div>
+            <div class="ch-toggle" onclick="toggleChannel(this)">
+              <span class="ch-emoji">▶</span>
+              <span class="ch-label">CodexaCraft YouTube</span>
+              <div class="ch-check"></div>
+            </div>
+            <div class="ch-toggle" onclick="toggleChannel(this)">
+              <span class="ch-emoji">👥</span>
+              <span class="ch-label">RupeeQ Facebook</span>
+              <div class="ch-check"></div>
+            </div>
+            <div class="ch-toggle" onclick="toggleChannel(this)">
+              <span class="ch-emoji">👥</span>
+              <span class="ch-label">Qwikpay Facebook</span>
+              <div class="ch-check"></div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;font-size:11px;color:var(--muted)" id="selected-count">2 channels selected</div>
+        </div>
+
+        <div class="broadcast-box">
+          <div class="broadcast-title">⏰ Schedule</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-row" style="margin:0">
+              <div class="form-label">Date</div>
+              <input type="date" class="form-input">
+            </div>
+            <div class="form-row" style="margin:0">
+              <div class="form-label">Time</div>
+              <input type="time" class="form-input" value="18:00">
+            </div>
+          </div>
+        </div>
+
+        <div class="broadcast-actions">
+          <button class="btn btn-ghost" style="flex:1">Save as Draft</button>
+          <button class="btn btn-ghost" style="flex:1">Preview</button>
+          <button class="btn btn-primary" style="flex:2;font-size:13px" onclick="handleBroadcast()">📡 Broadcast Now</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PIPELINE VIEW ── -->
+    <div id="view-pipeline" class="view">
+      <div class="tabs">
+        <div class="tab active">All Brands</div>
+        <div class="tab">RupeeQ</div>
+        <div class="tab">Qwikpay</div>
+        <div class="tab">QFit</div>
+        <div class="tab">CodexaCraft</div>
+      </div>
+
+      <div class="kanban">
+        <div class="kanban-col">
+          <div class="kanban-header">
+            <span class="kanban-col-title">💡 Ideas</span>
+            <span class="kanban-count">3</span>
+          </div>
+          <div class="kanban-body">
+            <div class="kanban-card">
+              <div class="kc-brand" style="color:var(--qfit)">QFit</div>
+              <div class="kc-title">Summer fitness challenge — 30 day series</div>
+              <div class="kc-footer">
+                <span class="kc-channels">IG · YT</span>
+                <span class="kc-date">Idea</span>
+              </div>
+            </div>
+            <div class="kanban-card">
+              <div class="kc-brand" style="color:var(--rupeeq)">RupeeQ</div>
+              <div class="kc-title">Overdraft vs Personal Loan — MCQ Series</div>
+              <div class="kc-footer">
+                <span class="kc-channels">LI · IG</span>
+                <span class="kc-date">Idea</span>
+              </div>
+            </div>
+            <div class="kanban-card">
+              <div class="kc-brand" style="color:var(--codexa)">CodexaCraft</div>
+              <div class="kc-title">90-day Growth Series — Week 1 teaser</div>
+              <div class="kc-footer">
+                <span class="kc-channels">LI · IG · YT</span>
+                <span class="kc-date">Idea</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-header">
+            <span class="kanban-col-title">✍️ Draft</span>
+            <span class="kanban-count">4</span>
+          </div>
+          <div class="kanban-body">
+            <div class="kanban-card">
+              <div class="kc-brand" style="color:var(--qfit)">QFit</div>
+              <div class="kc-title">Morning Workout — 5 min no equipment</div>
+              <div class="kc-footer">
+                <span class="kc-channels">IG Reels · YT Shorts</span>
+                <span class="kc-date">Today</span>
+              </div>
+            </div>
+            <div class="kanban-card">
+              <div class="kc-brand" style="color:var(--qwikpay)">Qwikpay</div>
+              <div class="kc-title">Digital Marketing Basics — Week 3</div>
+              <div class="kc-footer">
+                <span class="kc-channels">IG · FB</span>
+                <span class="kc-date">Aug 19</span>
+              </div>
+            </div>
+            <div class="kanban-card">
+              <div class="kc-brand" style="color:var(--rupeeq)">RupeeQ</div>
+              <div class="kc-title">Credit Score Myths — Carousel</div>
+              <div class="kc-footer">
+                <span class="kc-channels">LI · IG</span>
+                <span class="kc-date">Aug 20</span>
+              </div>
+            </div>
+            <div class="kanban-card">
+              <div class="kc-brand" style="color:var(--codexa)">CodexaCraft</div>
+              <div class="kc-title">Cloud Calling — Feature Explainer Post</div>
+              <div class="kc-footer">
+                <span class="kc-channels">LI · IG · YT</span>
+                <span class="kc-date">Aug 21</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-header">
+            <span class="kanban-col-title">🔍 Review</span>
+            <span class="kanban-count">2</span>
+          </div>
+          <div class="kanban-body">
+            <div class="kanban-card">
+              <div class="kc-brand" style="color:var(--codexa)">CodexaCraft</div>
+              <div class="kc-title">Cloud Calling Feature Demo Reel</div>
+              <div class="kc-footer">
+                <span class="kc-channels">YT · IG</span>
+                <span class="kc-date">Due: Tomorrow</span>
+              </div>
+            </div>
+            <div class="kanban-card">
+              <div class="kc-brand" style="color:var(--rupeeq)">RupeeQ</div>
+              <div class="kc-title">5 Free Tools Marketer Should Know</div>
+              <div class="kc-footer">
+                <span class="kc-channels">LI · IG</span>
+                <span class="kc-date">Due: Today</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-header">
+            <span class="kanban-col-title">✅ Scheduled</span>
+            <span class="kanban-count">5</span>
+          </div>
+          <div class="kanban-body">
+            <div class="kanban-card">
+              <div class="kc-brand" style="color:var(--rupeeq)">RupeeQ</div>
+              <div class="kc-title">5 Free Tools Carousel — Final Version</div>
+              <div class="kc-footer">
+                <span class="kc-channels">LI · IG</span>
+                <span class="kc-date">Today 3pm</span>
+              </div>
+            </div>
+            <div class="kanban-card">
+              <div class="kc-brand" style="color:var(--qwikpay)">Qwikpay</div>
+              <div class="kc-title">CIBIL Series — Part 4</div>
+              <div class="kc-footer">
+                <span class="kc-channels">IG · FB</span>
+                <span class="kc-date">Aug 18 6pm</span>
+              </div>
+            </div>
+            <div class="kanban-card">
+              <div class="kc-brand" style="color:var(--qfit)">QFit</div>
+              <div class="kc-title">QFit App Feature Highlight</div>
+              <div class="kc-footer">
+                <span class="kc-channels">IG · LI</span>
+                <span class="kc-date">Aug 19</span>
+              </div>
+            </div>
+            <div class="kanban-card">
+              <div class="kc-brand" style="color:var(--codexa)">CodexaCraft</div>
+              <div class="kc-title">Week 2 Growth Challenge post</div>
+              <div class="kc-footer">
+                <span class="kc-channels">LI · IG</span>
+                <span class="kc-date">Aug 20</span>
+              </div>
+            </div>
+            <div class="kanban-card">
+              <div class="kc-brand" style="color:var(--rupeeq)">RupeeQ</div>
+              <div class="kc-title">ACE Credit Report — Launch Teaser</div>
+              <div class="kc-footer">
+                <span class="kc-channels">LI · IG · FB</span>
+                <span class="kc-date">Aug 22</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ANALYTICS VIEW ── -->
+    <div id="view-analytics" class="view">
+      <div class="stats-row" style="margin-bottom:16px">
+        <div class="stat-card">
+          <div class="stat-label">Total Reach</div>
+          <div class="stat-value">2.3L</div>
+          <div class="stat-sub"><span class="stat-up">↑ 41%</span> this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Engagement Rate</div>
+          <div class="stat-value">4.8%</div>
+          <div class="stat-sub"><span class="stat-up">↑ 0.6%</span> vs avg</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Posts Published</div>
+          <div class="stat-value">84</div>
+          <div class="stat-sub">Across 4 brands</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">LinkedIn Impressions</div>
+          <div class="stat-value">1.0L+</div>
+          <div class="stat-sub"><span class="stat-up">🎉 Milestone hit!</span></div>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Brand Performance</span></div>
+          <div class="panel-body">
+            <div class="brand-stat-row">
+              <div class="bs-name" style="color:var(--rupeeq)">RupeeQ</div>
+              <div class="bs-bar-wrap"><div class="bs-bar" style="width:85%;background:var(--rupeeq)"></div></div>
+              <div class="bs-val">85k reach</div>
+            </div>
+            <div class="brand-stat-row">
+              <div class="bs-name" style="color:var(--codexa)">CodexaCraft</div>
+              <div class="bs-bar-wrap"><div class="bs-bar" style="width:62%;background:var(--codexa)"></div></div>
+              <div class="bs-val">62k reach</div>
+            </div>
+            <div class="brand-stat-row">
+              <div class="bs-name" style="color:var(--qwikpay)">Qwikpay</div>
+              <div class="bs-bar-wrap"><div class="bs-bar" style="width:48%;background:var(--qwikpay)"></div></div>
+              <div class="bs-val">48k reach</div>
+            </div>
+            <div class="brand-stat-row">
+              <div class="bs-name" style="color:var(--qfit)">QFit</div>
+              <div class="bs-bar-wrap"><div class="bs-bar" style="width:35%;background:var(--qfit)"></div></div>
+              <div class="bs-val">35k reach</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Channel Breakdown</span></div>
+          <div class="panel-body">
+            <div class="brand-stat-row">
+              <div class="bs-name">Instagram</div>
+              <div class="bs-bar-wrap"><div class="bs-bar" style="width:78%;background:#e1306c"></div></div>
+              <div class="bs-val">78k</div>
+            </div>
+            <div class="brand-stat-row">
+              <div class="bs-name">LinkedIn</div>
+              <div class="bs-bar-wrap"><div class="bs-bar" style="width:65%;background:#0077b5"></div></div>
+              <div class="bs-val">65k</div>
+            </div>
+            <div class="brand-stat-row">
+              <div class="bs-name">YouTube</div>
+              <div class="bs-bar-wrap"><div class="bs-bar" style="width:42%;background:#ff0000"></div></div>
+              <div class="bs-val">42k</div>
+            </div>
+            <div class="brand-stat-row">
+              <div class="bs-name">Facebook</div>
+              <div class="bs-bar-wrap"><div class="bs-bar" style="width:28%;background:#1877f2"></div></div>
+              <div class="bs-val">28k</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Weekly Post Volume</span></div>
+          <div class="mini-chart">
+            <div class="bar-item" style="height:45%;background:var(--rupeeq);opacity:0.7" title="Week 1: 14 posts"></div>
+            <div class="bar-item" style="height:60%;background:var(--rupeeq);opacity:0.7" title="Week 2: 18 posts"></div>
+            <div class="bar-item" style="height:55%;background:var(--rupeeq);opacity:0.7" title="Week 3: 17 posts"></div>
+            <div class="bar-item" style="height:85%;background:var(--rupeeq)" title="Week 4: 26 posts"></div>
+            <div class="bar-item" style="height:70%;background:var(--rupeeq);opacity:0.8" title="Week 5: 21 posts"></div>
+          </div>
+          <div style="padding:0 14px 10px;font-size:10px;color:var(--muted)">Last 5 weeks · All brands combined</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Top Performing Posts</span></div>
+          <div class="panel-body">
+            <div class="post-row">
+              <div class="post-brand-badge" style="background:var(--rupeeq)"></div>
+              <div class="post-info">
+                <div class="post-title">15 Free Certifications</div>
+                <div class="post-meta">LinkedIn · 1,00,000+ impressions 🎉</div>
+              </div>
+              <span style="font-size:11px;color:var(--rupeeq);font-weight:600">1L+</span>
+            </div>
+            <div class="post-row">
+              <div class="post-brand-badge" style="background:var(--codexa)"></div>
+              <div class="post-info">
+                <div class="post-title">Cloud Calling UGC Ad</div>
+                <div class="post-meta">YouTube · 34k views</div>
+              </div>
+              <span style="font-size:11px;color:var(--codexa);font-weight:600">34k</span>
+            </div>
+            <div class="post-row">
+              <div class="post-brand-badge" style="background:var(--qfit)"></div>
+              <div class="post-info">
+                <div class="post-title">QFit 30-day Challenge</div>
+                <div class="post-meta">Instagram · 22k reach</div>
+              </div>
+              <span style="font-size:11px;color:var(--qfit);font-weight:600">22k</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TEAM VIEW ── -->
+    <div id="view-team" class="view">
+      <div style="margin-bottom:16px">
+        <div style="font-family:var(--font-display);font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px">Team Overview</div>
+        <div style="font-size:12px;color:var(--muted)">4 members · Active tasks this week</div>
+      </div>
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="team-avatar" style="background:linear-gradient(135deg,var(--rupeeq),var(--qwikpay))">PR</div>
+          <div>
+            <div class="tm-name">Priyanshu Raj</div>
+            <div class="tm-role">Social Media Manager · Lead</div>
+            <div class="tm-tasks">Assigned tasks:</div>
+            <div class="tm-task-item"><div class="tm-task-dot" style="background:var(--rupeeq)"></div> RupeeQ content strategy review</div>
+            <div class="tm-task-item"><div class="tm-task-dot" style="background:var(--qwikpay)"></div> Qwikpay CIBIL Series — approve</div>
+            <div class="tm-task-item"><div class="tm-task-dot" style="background:var(--codexa)"></div> CodexaCraft 90-day roadmap</div>
+          </div>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar" style="background:linear-gradient(135deg,#a855f7,#ec4899)">VE</div>
+          <div>
+            <div class="tm-name">Video Editor</div>
+            <div class="tm-role">Video Production</div>
+            <div class="tm-tasks">Assigned tasks:</div>
+            <div class="tm-task-item"><div class="tm-task-dot" style="background:var(--codexa)"></div> CodexaCraft Cloud Calling Demo Reel</div>
+            <div class="tm-task-item"><div class="tm-task-dot" style="background:var(--qfit)"></div> QFit Morning Workout Reel</div>
+            <div class="tm-task-item"><div class="tm-task-dot" style="background:var(--rupeeq)"></div> RupeeQ Brand Intro Video</div>
+          </div>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">GD</div>
+          <div>
+            <div class="tm-name">Graphic Designer</div>
+            <div class="tm-role">Creatives & Visuals</div>
+            <div class="tm-tasks">Assigned tasks:</div>
+            <div class="tm-task-item"><div class="tm-task-dot" style="background:var(--rupeeq)"></div> 5 Free Tools Carousel Design</div>
+            <div class="tm-task-item"><div class="tm-task-dot" style="background:var(--qwikpay)"></div> Qwikpay Brand Template Update</div>
+            <div class="tm-task-item"><div class="tm-task-dot" style="background:var(--qfit)"></div> QFit App Store Banners</div>
+          </div>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar" style="background:linear-gradient(135deg,#06b6d4,#3b82f6)">CC</div>
+          <div>
+            <div class="tm-name">Content Creator</div>
+            <div class="tm-role">Copy & Content Writing</div>
+            <div class="tm-tasks">Assigned tasks:</div>
+            <div class="tm-task-item"><div class="tm-task-dot" style="background:var(--rupeeq)"></div> Credit Score Myths Blog Draft</div>
+            <div class="tm-task-item"><div class="tm-task-dot" style="background:var(--qwikpay)"></div> Overdraft MCQ Series — 5 posts</div>
+            <div class="tm-task-item"><div class="tm-task-dot" style="background:var(--codexa)"></div> CodexaCraft LinkedIn Week 2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  function switchView(name, el) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    if (el) el.classList.add('active');
+    const titles = {
+      dashboard: 'Dashboard',
+      broadcast: 'Broadcast Post',
+      pipeline: 'Content Pipeline',
+      analytics: 'Analytics',
+      team: 'Team'
+    };
+    document.getElementById('page-title').textContent = titles[name] || name;
+  }
+
+  function filterBrand(brand, el) {
+    document.querySelectorAll('.brand-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function toggleChannel(el) {
+    el.classList.toggle('selected');
+    const check = el.querySelector('.ch-check');
+    check.textContent = el.classList.contains('selected') ? '✓' : '';
+    const count = document.querySelectorAll('.ch-toggle.selected').length;
+    document.getElementById('selected-count').textContent = count + ' channel' + (count !== 1 ? 's' : '') + ' selected';
+  }
+
+  function handleBroadcast() {
+    const count = document.querySelectorAll('.ch-toggle.selected').length;
+    if (count === 0) {
+      alert('Pehle koi channel select karo!');
+      return;
+    }
+    const btn = event.target;
+    btn.textContent = '⏳ Posting...';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = '✅ Broadcast Ho Gaya!';
+      btn.style.background = '#00c48c';
+      setTimeout(() => {
+        btn.textContent = '📡 Broadcast Now';
+        btn.style.background = '';
+        btn.disabled = false;
+      }, 2500);
+    }, 1800);
+  }
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

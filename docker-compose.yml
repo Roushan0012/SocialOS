@@ -1,0 +1,228 @@
+# ==============================================================================
+# SocialOS Local Development Infrastructure
+# ==============================================================================
+# Services:
+#   1. socialos-redis: Redis 7.2 (Cache & Task Broker)
+#   2. socialos-minio: MinIO Object Storage (LOCAL DEVELOPMENT ONLY)
+#   3. socialos-minio-init: Automated local bucket provisioning
+#   4. socialos-postgres: PostgreSQL 16 (Local Database; Target Prod is Supabase)
+#   5. socialos-backend: Python FastAPI Application Engine
+#   6. socialos-worker: Celery Background Task Worker Fleet
+#   7. socialos-beat: Celery Beat Periodic Scheduler
+#   8. socialos-frontend: Next.js 15 Web Application
+#
+# NOTE: MinIO is strictly for local development. Production media storage is
+#       AWS S3 + Amazon CloudFront CDN.
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. Redis 7.2 (Cache, Session Store, Celery Broker)
+  # ----------------------------------------------------------------------------
+  socialos-redis:
+    image: redis:7.2-alpine
+    container_name: socialos-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - socialos-network
+
+  # ----------------------------------------------------------------------------
+  # 2. MinIO S3-Compatible Storage (LOCAL DEVELOPMENT ONLY)
+  # ----------------------------------------------------------------------------
+  socialos-minio:
+    image: minio/minio:latest
+    container_name: socialos-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000" # MinIO S3 API Endpoint
+      - "9001:9001" # MinIO Web Console
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - socialos-network
+
+  # Helper container to create local development bucket
+  socialos-minio-init:
+    image: minio/mc:latest
+    container_name: socialos-minio-init
+    depends_on:
+      socialos-minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      until /usr/bin/mc alias set localminio http://socialos-minio:9000 minioadmin minioadmin; do
+        echo 'Waiting for MinIO...';
+        sleep 1;
+      done;
+      /usr/bin/mc mb --ignore-existing localminio/${MINIO_BUCKET_NAME:-socialos-media-local};
+      echo 'MinIO local bucket initialized.';
+      exit 0;
+      "
+    networks:
+      - socialos-network
+
+  # ----------------------------------------------------------------------------
+  # 3. Local PostgreSQL 16 (Local dev fallback; Production uses Supabase PG)
+  # ----------------------------------------------------------------------------
+  socialos-postgres:
+    image: postgres:16-alpine
+    container_name: socialos-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-socialos}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d socialos"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - socialos-network
+
+  # ----------------------------------------------------------------------------
+  # 4. FastAPI Backend Application
+  # ----------------------------------------------------------------------------
+  socialos-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: socialos-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DEBUG: ${DEBUG:-true}
+      SECRET_KEY: ${SECRET_KEY:-change-this-in-production-use-a-strong-random-secret-key-32-chars}
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@socialos-postgres:5432/socialos
+      REDIS_URL: redis://socialos-redis:6379/0
+      CELERY_BROKER_URL: redis://socialos-redis:6379/1
+      CELERY_RESULT_BACKEND: redis://socialos-redis:6379/2
+      USE_LOCAL_STORAGE: "true"
+      MINIO_ENDPOINT: http://socialos-minio:9000
+      MINIO_PUBLIC_ENDPOINT: http://localhost:9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME:-socialos-media-local}
+      ALLOWED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      socialos-redis:
+        condition: service_healthy
+      socialos-postgres:
+        condition: service_healthy
+      socialos-minio:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - socialos-network
+
+  # ----------------------------------------------------------------------------
+  # 5. Celery Worker Fleet
+  # ----------------------------------------------------------------------------
+  socialos-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: socialos-worker
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@socialos-postgres:5432/socialos
+      REDIS_URL: redis://socialos-redis:6379/0
+      CELERY_BROKER_URL: redis://socialos-redis:6379/1
+      CELERY_RESULT_BACKEND: redis://socialos-redis:6379/2
+      MINIO_ENDPOINT: http://socialos-minio:9000
+    volumes:
+      - ./backend:/app
+    depends_on:
+      socialos-redis:
+        condition: service_healthy
+      socialos-backend:
+        condition: service_started
+    command: celery -A app.workers.celery_app.celery_app worker -l info -Q default,publish_queue,analytics_queue,maintenance_queue
+    networks:
+      - socialos-network
+
+  # ----------------------------------------------------------------------------
+  # 6. Celery Beat Periodic Scheduler
+  # ----------------------------------------------------------------------------
+  socialos-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: socialos-beat
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@socialos-postgres:5432/socialos
+      REDIS_URL: redis://socialos-redis:6379/0
+      CELERY_BROKER_URL: redis://socialos-redis:6379/1
+      CELERY_RESULT_BACKEND: redis://socialos-redis:6379/2
+    volumes:
+      - ./backend:/app
+    depends_on:
+      socialos-redis:
+        condition: service_healthy
+      socialos-backend:
+        condition: service_started
+    command: celery -A app.workers.celery_app.celery_app beat -l info
+    networks:
+      - socialos-network
+
+  # ----------------------------------------------------------------------------
+  # 7. Next.js 15 Frontend
+  # ----------------------------------------------------------------------------
+  socialos-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: socialos-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      PORT: 3000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - socialos-backend
+    command: npm run dev
+    networks:
+      - socialos-network
+
+networks:
+  socialos-network:
+    driver: bridge
+
+volumes:
+  redis_data:
+  postgres_data:
+  minio_data:

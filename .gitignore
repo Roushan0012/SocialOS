@@ -1,0 +1,123 @@
+# ==============================================================================
+# SocialOS .gitignore
+# ==============================================================================
+
+# Node.js & Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store/
+package-lock.json.bak
+
+# Next.js Build & Outputs
+.next/
+out/
+build/
+dist/
+.open-next/
+*.tsbuildinfo
+
+# Python & FastAPI
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.env/
+.venv/
+venv/
+ENV/
+
+# Environment Variables & Secrets (CRITICAL: NEVER COMMIT SECRETS)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+!*.env.example
+
+# Testing & Coverage
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+coverage/
+htmlcov/
+
+# Type Checkers & Linters
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+.eslintcache
+.stylelintcache
+
+# IDE & Editor Files
+.vscode/
+!.vscode/settings.json.example
+!.vscode/extensions.json
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.swp
+*.swo
+*~
+*.bak
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Docker & Container Artifacts
+*.log
+docker-compose.override.yml
+
+# Local Storage, MinIO & Upload Artifacts
+minio_data/
+storage/
+uploads/
+temp_media/
+media_uploads/
+*.sqlite3
+*.db
+local_postgres_data/
+
+# Celery & Celery Beat Schedule
+celerybeat-schedule*
+celerybeat.pid
