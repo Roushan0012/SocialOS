@@ -4,10 +4,10 @@ import pytest
 from app.core.database import Base, check_database_health
 
 
-def test_zero_business_tables_in_foundation():
-    """Verify strictly NO business tables are defined in Step 5."""
-    assert len(Base.metadata.tables) == 0, (
-        f"Expected 0 tables in Base.metadata for foundation, found: {list(Base.metadata.tables.keys())}"
+def test_all_14_business_tables_registered():
+    """Verify strictly 14 core business tables are defined in Step 6."""
+    assert len(Base.metadata.tables) == 14, (
+        f"Expected 14 tables in Base.metadata, found {len(Base.metadata.tables)}: {list(Base.metadata.tables.keys())}"
     )
 
 
