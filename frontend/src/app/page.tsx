@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function HomePage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-canvas text-gray-200">
@@ -36,7 +38,17 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="pt-2 text-xs text-gray-500 flex items-center justify-between border-t border-borderSubtle">
+        <div className="pt-2 flex items-center justify-between border-t border-borderSubtle">
+          <span className="text-xs text-gray-400">Social Channels Management:</span>
+          <Link
+            href="/social/accounts"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-brandPrimary hover:bg-indigo-600 transition-colors shadow-sm"
+          >
+            Manage Social Accounts &rarr;
+          </Link>
+        </div>
+
+        <div className="text-[11px] text-gray-500 flex items-center justify-between border-t border-borderSubtle/60 pt-2">
           <span>Production Media: AWS S3 + Amazon CloudFront</span>
           <span>Local Storage: MinIO</span>
         </div>

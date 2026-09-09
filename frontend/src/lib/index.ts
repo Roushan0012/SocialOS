@@ -1,2 +1,5 @@
-// Library utilities foundation placeholder
-export {};
+/**
+ * SocialOS Frontend Utilities and API Client Exports.
+ */
+
+export * from "./api";
