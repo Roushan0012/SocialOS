@@ -23,7 +23,8 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 # Override URL with dynamic migration URL (uses DIRECT_URL if set, falling back to DATABASE_URL)
-config.set_main_option("sqlalchemy.url", settings.migration_database_url)
+# Escape % to %% to prevent configparser interpolation errors with URL-encoded passwords
+config.set_main_option("sqlalchemy.url", settings.migration_database_url.replace("%", "%%"))
 
 
 def run_migrations_offline() -> None:

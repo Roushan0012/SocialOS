@@ -19,7 +19,7 @@ def test_alembic_uses_migration_database_url():
     alembic_cfg = Config(str(alembic_ini_path))
 
     migration_url = settings.migration_database_url
-    alembic_cfg.set_main_option("sqlalchemy.url", migration_url)
+    alembic_cfg.set_main_option("sqlalchemy.url", migration_url.replace("%", "%%"))
 
     assert alembic_cfg.get_main_option("sqlalchemy.url") == migration_url
 
@@ -56,7 +56,7 @@ def test_alembic_migration_upgrade_sql_generation(capsys):
 
     alembic_ini_path = Path(__file__).resolve().parent.parent / "alembic.ini"
     alembic_cfg = Config(str(alembic_ini_path))
-    alembic_cfg.set_main_option("sqlalchemy.url", settings.migration_database_url)
+    alembic_cfg.set_main_option("sqlalchemy.url", settings.migration_database_url.replace("%", "%%"))
 
     # Generate offline SQL
     command.upgrade(alembic_cfg, "head", sql=True)
@@ -76,7 +76,7 @@ def test_alembic_migration_downgrade_sql_generation(capsys):
 
     alembic_ini_path = Path(__file__).resolve().parent.parent / "alembic.ini"
     alembic_cfg = Config(str(alembic_ini_path))
-    alembic_cfg.set_main_option("sqlalchemy.url", settings.migration_database_url)
+    alembic_cfg.set_main_option("sqlalchemy.url", settings.migration_database_url.replace("%", "%%"))
 
     # Generate offline downgrade SQL
     command.downgrade(alembic_cfg, "0001_initial_schema:base", sql=True)
