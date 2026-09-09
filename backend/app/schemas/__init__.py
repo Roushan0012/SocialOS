@@ -25,6 +25,13 @@ from app.schemas.user import (
     UserListResponse,
 )
 
+from app.schemas.social import (
+    SocialAccountRead,
+    OAuthStartResponse,
+    OAuthCallbackResponse,
+    TokenRefreshResponse,
+)
+
 __all__ = [
     "HealthResponse",
     "DatabaseHealthResponse",
@@ -46,4 +53,8 @@ __all__ = [
     "UserDetailResponse",
     "UserProfileResponse",
     "UserListResponse",
+    "SocialAccountRead",
+    "OAuthStartResponse",
+    "OAuthCallbackResponse",
+    "TokenRefreshResponse",
 ]

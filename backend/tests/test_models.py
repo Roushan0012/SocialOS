@@ -50,6 +50,7 @@ def test_all_models_registered_in_metadata():
         "social_analytics_daily",
         "auth_sessions",
         "company_memberships",
+        "oauth_states",
     }
     actual_tables = set(Base.metadata.tables.keys())
     assert actual_tables == expected_tables
@@ -237,7 +238,7 @@ def test_security_rules():
 
 
 def test_schema_creation_and_teardown_in_sqlite():
-    """Verify all 16 models can be created and dropped cleanly in an in-memory SQLite database."""
+    """Verify all 17 models can be created and dropped cleanly in an in-memory SQLite database."""
     from sqlalchemy import create_engine
 
     test_engine = create_engine("sqlite:///:memory:", echo=False)
@@ -247,7 +248,7 @@ def test_schema_creation_and_teardown_in_sqlite():
 
     insp = inspect(test_engine)
     tables = insp.get_table_names()
-    assert len(tables) == 16
+    assert len(tables) == 17
     assert "roles" in tables
     assert "users" in tables
     assert "companies" in tables
@@ -256,6 +257,7 @@ def test_schema_creation_and_teardown_in_sqlite():
     assert "attendance" in tables
     assert "auth_sessions" in tables
     assert "company_memberships" in tables
+    assert "oauth_states" in tables
 
     # Teardown
     Base.metadata.drop_all(test_engine)

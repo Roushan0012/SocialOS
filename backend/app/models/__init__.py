@@ -30,6 +30,7 @@ from app.models.activity_log import ActivityLog
 from app.models.social_analytics import SocialAnalyticsDaily
 from app.models.auth_session import AuthSession
 from app.models.company_membership import CompanyMembership
+from app.models.oauth_state import OAuthState
 
 __all__ = [
     "Base",
@@ -44,12 +45,13 @@ __all__ = [
     "TaskPriority",
     "TaskStatus",
     "AttendanceStatus",
-    # Models (16 tables)
+    # Models (17 tables)
     "Role",
     "User",
     "Company",
     "CompanyMembership",
     "SocialAccount",
+    "OAuthState",
     "Post",
     "PostTarget",
     "MediaAsset",

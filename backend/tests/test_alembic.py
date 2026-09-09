@@ -41,11 +41,12 @@ EXPECTED_TABLES = {
     "social_analytics_daily",
     "auth_sessions",
     "company_memberships",
+    "oauth_states",
 }
 
 
 def test_alembic_target_metadata_contains_all_tables():
-    """Verify that Alembic target metadata registers all 16 required SocialOS tables."""
+    """Verify that Alembic target metadata registers all 17 required SocialOS tables."""
     table_names = set(Base.metadata.tables.keys())
     assert table_names == EXPECTED_TABLES, (
         f"Base.metadata mismatch. Missing: {EXPECTED_TABLES - table_names}, Extra: {table_names - EXPECTED_TABLES}"

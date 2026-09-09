@@ -93,6 +93,9 @@ class Settings(BaseSettings):
     BOOTSTRAP_ADMIN_EMAIL: Optional[str] = None
     BOOTSTRAP_ADMIN_PASSWORD: Optional[str] = None
 
+    # 5.2 Social Token Encryption (AES-256-GCM)
+    SOCIAL_TOKEN_ENCRYPTION_KEY: str = "socialos-dev-social-token-encryption-key-32bytes!"
+
     @model_validator(mode="after")
     def validate_production_security(self) -> "Settings":
         if self.ENVIRONMENT.lower() == "production":
@@ -108,6 +111,15 @@ class Settings(BaseSettings):
             if "change-this" in self.SECRET_KEY.lower() or len(self.SECRET_KEY) < 32:
                 raise ValueError(
                     "In production, SECRET_KEY must be a strong random secret with at least 32 characters."
+                )
+            if (
+                not self.SOCIAL_TOKEN_ENCRYPTION_KEY
+                or len(self.SOCIAL_TOKEN_ENCRYPTION_KEY) < 32
+                or "dev" in self.SOCIAL_TOKEN_ENCRYPTION_KEY.lower()
+                or "change-this" in self.SOCIAL_TOKEN_ENCRYPTION_KEY.lower()
+            ):
+                raise ValueError(
+                    "In production, SOCIAL_TOKEN_ENCRYPTION_KEY must be configured with a 256-bit (32-byte) strong random key."
                 )
         return self
 
@@ -128,11 +140,34 @@ class Settings(BaseSettings):
     MINIO_ROOT_PASSWORD: str = "minioadmin"
     MINIO_BUCKET_NAME: str = "socialos-media-local"
 
-    # 8. Third-Party OAuth Placeholders for future steps
-    META_CLIENT_ID: Optional[str] = None
-    META_CLIENT_SECRET: Optional[str] = None
+    # 8. Social OAuth Providers Configuration
+    # 8.1 Instagram
+    INSTAGRAM_CLIENT_ID: Optional[str] = None
+    INSTAGRAM_CLIENT_SECRET: Optional[str] = None
+    INSTAGRAM_REDIRECT_URI: str = "http://localhost:8000/api/v1/social/oauth/instagram/callback"
+    INSTAGRAM_SCOPES: str = "instagram_basic,pages_show_list"
+
+    # 8.2 Facebook
+    FACEBOOK_CLIENT_ID: Optional[str] = None
+    FACEBOOK_CLIENT_SECRET: Optional[str] = None
+    FACEBOOK_REDIRECT_URI: str = "http://localhost:8000/api/v1/social/oauth/facebook/callback"
+    FACEBOOK_SCOPES: str = "pages_show_list,pages_read_engagement,pages_manage_posts,public_profile"
+
+    # 8.3 LinkedIn
     LINKEDIN_CLIENT_ID: Optional[str] = None
     LINKEDIN_CLIENT_SECRET: Optional[str] = None
+    LINKEDIN_REDIRECT_URI: str = "http://localhost:8000/api/v1/social/oauth/linkedin/callback"
+    LINKEDIN_SCOPES: str = "openid,profile,email,w_member_social"
+
+    # 8.4 YouTube / Google
+    YOUTUBE_CLIENT_ID: Optional[str] = None
+    YOUTUBE_CLIENT_SECRET: Optional[str] = None
+    YOUTUBE_REDIRECT_URI: str = "http://localhost:8000/api/v1/social/oauth/youtube/callback"
+    YOUTUBE_SCOPES: str = "https://www.googleapis.com/auth/youtube.readonly,https://www.googleapis.com/auth/userinfo.profile"
+
+    # Meta & Google generic fallbacks
+    META_CLIENT_ID: Optional[str] = None
+    META_CLIENT_SECRET: Optional[str] = None
     GOOGLE_CLIENT_ID: Optional[str] = None
     GOOGLE_CLIENT_SECRET: Optional[str] = None
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response, status
 
-from app.api.v1 import auth, companies, users
+from app.api.v1 import auth, companies, social, users
 from app.core.config import settings
 from app.core.database import check_database_health
 from app.schemas.health import HealthResponse, DatabaseHealthResponse
@@ -9,6 +9,7 @@ api_router = APIRouter()
 api_router.include_router(auth.router)
 api_router.include_router(companies.router)
 api_router.include_router(users.router)
+api_router.include_router(social.router)
 
 
 @api_router.get("/healthz", response_model=HealthResponse, tags=["Health"])

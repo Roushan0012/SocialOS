@@ -88,6 +88,10 @@ class SocialAccount(Base, TimestampMixin):
         JSONB().with_variant(JSON(), "sqlite"),
         nullable=True,
     )
+    last_connected_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
 
     # Relationships
     company: Mapped["Company"] = relationship(
