@@ -1,11 +1,12 @@
 from contextlib import asynccontextmanager
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.api_router import api_router
 from app.core.config import settings
-from app.schemas.health import HealthResponse
+from app.core.database import check_database_health
+from app.schemas.health import HealthResponse, DatabaseHealthResponse
 
 # Configure root logger
 logging.basicConfig(
@@ -19,6 +20,8 @@ logger = logging.getLogger("socialos")
 async def lifespan(app: FastAPI):
     """Application startup and shutdown events."""
     logger.info(f"Starting {settings.APP_NAME} in [{settings.ENVIRONMENT}] mode...")
+    sanitized_url = settings.sanitize_db_url(settings.DATABASE_URL)
+    logger.info(f"Target Database endpoint: {sanitized_url}")
     yield
     logger.info(f"Shutting down {settings.APP_NAME}...")
 
@@ -53,6 +56,34 @@ async def root_health_check() -> HealthResponse:
     )
 
 
+@app.get(
+    "/healthz/db",
+    response_model=DatabaseHealthResponse,
+    responses={
+        200: {"model": DatabaseHealthResponse, "description": "Database reachable"},
+        503: {"model": DatabaseHealthResponse, "description": "Database unreachable"},
+    },
+    tags=["Health"],
+)
+async def root_database_health_check(response: Response) -> DatabaseHealthResponse:
+    """Safe database connectivity health check (SELECT 1).
+    Never exposes passwords, tokens, or connection strings.
+    """
+    is_connected = await check_database_health()
+    if is_connected:
+        return DatabaseHealthResponse(
+            status="ok",
+            database="connected",
+            engine="postgresql+asyncpg",
+        )
+    response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    return DatabaseHealthResponse(
+        status="error",
+        database="disconnected",
+        engine="postgresql+asyncpg",
+    )
+
+
 @app.get("/", tags=["Root"])
 async def root_info():
     """Root informative index."""
@@ -62,6 +93,7 @@ async def root_info():
         "environment": settings.ENVIRONMENT,
         "docs": "/docs" if settings.DEBUG else "disabled",
         "health": "/healthz",
+        "health_db": "/healthz/db",
     }
 
 

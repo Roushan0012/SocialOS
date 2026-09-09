@@ -80,7 +80,7 @@ services:
       - socialos-network
 
   # ----------------------------------------------------------------------------
-  # 3. Local PostgreSQL 16 (Local dev fallback; Production uses Supabase PG)
+  # 3. Local PostgreSQL 16 (Optional offline fallback; Primary DB is Supabase)
   # ----------------------------------------------------------------------------
   socialos-postgres:
     image: postgres:16-alpine
@@ -117,7 +117,12 @@ services:
       ENVIRONMENT: ${ENVIRONMENT:-development}
       DEBUG: ${DEBUG:-true}
       SECRET_KEY: ${SECRET_KEY:-change-this-in-production-use-a-strong-random-secret-key-32-chars}
-      DATABASE_URL: postgresql+asyncpg://postgres:postgres@socialos-postgres:5432/socialos
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://postgres:postgres@socialos-postgres:5432/socialos}
+      DIRECT_URL: ${DIRECT_URL:-}
+      SUPABASE_URL: ${SUPABASE_URL:-https://nsgpjfjziuedhnjkpucp.supabase.co}
+      SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY:-}
+      SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY:-}
+      SUPABASE_JWKS_URL: ${SUPABASE_JWKS_URL:-https://nsgpjfjziuedhnjkpucp.supabase.co/auth/v1/.well-known/jwks.json}
       REDIS_URL: redis://socialos-redis:6379/0
       CELERY_BROKER_URL: redis://socialos-redis:6379/1
       CELERY_RESULT_BACKEND: redis://socialos-redis:6379/2
@@ -132,8 +137,6 @@ services:
       - ./backend:/app
     depends_on:
       socialos-redis:
-        condition: service_healthy
-      socialos-postgres:
         condition: service_healthy
       socialos-minio:
         condition: service_healthy
@@ -152,7 +155,8 @@ services:
     restart: unless-stopped
     environment:
       ENVIRONMENT: ${ENVIRONMENT:-development}
-      DATABASE_URL: postgresql+asyncpg://postgres:postgres@socialos-postgres:5432/socialos
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://postgres:postgres@socialos-postgres:5432/socialos}
+      SUPABASE_URL: ${SUPABASE_URL:-https://nsgpjfjziuedhnjkpucp.supabase.co}
       REDIS_URL: redis://socialos-redis:6379/0
       CELERY_BROKER_URL: redis://socialos-redis:6379/1
       CELERY_RESULT_BACKEND: redis://socialos-redis:6379/2
@@ -179,7 +183,7 @@ services:
     restart: unless-stopped
     environment:
       ENVIRONMENT: ${ENVIRONMENT:-development}
-      DATABASE_URL: postgresql+asyncpg://postgres:postgres@socialos-postgres:5432/socialos
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://postgres:postgres@socialos-postgres:5432/socialos}
       REDIS_URL: redis://socialos-redis:6379/0
       CELERY_BROKER_URL: redis://socialos-redis:6379/1
       CELERY_RESULT_BACKEND: redis://socialos-redis:6379/2
