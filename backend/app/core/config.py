@@ -1,6 +1,6 @@
 from typing import List, Optional
 from urllib.parse import urlparse
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -79,13 +79,37 @@ class Settings(BaseSettings):
     CELERY_BROKER_URL: str = "redis://localhost:6379/1"
     CELERY_RESULT_BACKEND: str = "redis://localhost:6379/2"
 
-    # 5. Security & JWT (Placeholders for future implementation)
-    JWT_PRIVATE_KEY: Optional[str] = None
-    JWT_PUBLIC_KEY: Optional[str] = None
-    JWT_ALGORITHM: str = "RS256"
+    # 5. Security & JWT
+    JWT_SECRET_KEY: str = "socialos-dev-jwt-secret-key-change-in-production-min-32-chars-long"
+    JWT_ALGORITHM: str = "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     OAUTH_ENCRYPTION_KEY: Optional[str] = None
+
+    # 5.1 Admin Bootstrap Configuration
+    BOOTSTRAP_ADMIN_NAME: str = "Admin User"
+    BOOTSTRAP_ADMIN_EMAIL: Optional[str] = None
+    BOOTSTRAP_ADMIN_PASSWORD: Optional[str] = None
+
+    @model_validator(mode="after")
+    def validate_production_security(self) -> "Settings":
+        if self.ENVIRONMENT.lower() == "production":
+            insecure_jwt = [
+                "socialos-dev-jwt-secret-key-change-in-production-min-32-chars-long",
+                "change-this",
+                "secret",
+            ]
+            if any(bad in self.JWT_SECRET_KEY.lower() for bad in insecure_jwt) or len(self.JWT_SECRET_KEY) < 32:
+                raise ValueError(
+                    "In production, JWT_SECRET_KEY must be a strong random secret with at least 32 characters."
+                )
+            if "change-this" in self.SECRET_KEY.lower() or len(self.SECRET_KEY) < 32:
+                raise ValueError(
+                    "In production, SECRET_KEY must be a strong random secret with at least 32 characters."
+                )
+        return self
 
     # 6. Production Media Storage (AWS S3 + Amazon CloudFront)
     # Note: AWS S3 + Amazon CloudFront is the singular production architecture standard.

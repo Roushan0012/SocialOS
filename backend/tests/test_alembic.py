@@ -39,11 +39,12 @@ EXPECTED_TABLES = {
     "notifications",
     "activity_logs",
     "social_analytics_daily",
+    "auth_sessions",
 }
 
 
-def test_alembic_target_metadata_contains_all_14_tables():
-    """Verify that Alembic target metadata registers all 14 required SocialOS tables."""
+def test_alembic_target_metadata_contains_all_tables():
+    """Verify that Alembic target metadata registers all 15 required SocialOS tables."""
     table_names = set(Base.metadata.tables.keys())
     assert table_names == EXPECTED_TABLES, (
         f"Base.metadata mismatch. Missing: {EXPECTED_TABLES - table_names}, Extra: {table_names - EXPECTED_TABLES}"
@@ -78,8 +79,8 @@ def test_alembic_migration_downgrade_sql_generation(capsys):
     alembic_cfg = Config(str(alembic_ini_path))
     alembic_cfg.set_main_option("sqlalchemy.url", settings.migration_database_url.replace("%", "%%"))
 
-    # Generate offline downgrade SQL
-    command.downgrade(alembic_cfg, "0001_initial_schema:base", sql=True)
+    # Generate offline downgrade SQL from head to base
+    command.downgrade(alembic_cfg, "head:base", sql=True)
     captured = capsys.readouterr()
     sql_output = captured.out
 

@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from app.models.attendance import Attendance
     from app.models.notification import Notification
     from app.models.activity_log import ActivityLog
+    from app.models.auth_session import AuthSession
 
 
 class User(Base, TimestampMixin):
@@ -59,6 +60,7 @@ class User(Base, TimestampMixin):
     role: Mapped["Role"] = relationship(
         "Role",
         back_populates="users",
+        lazy="joined",
     )
     created_posts: Mapped[List["Post"]] = relationship(
         "Post",
@@ -88,6 +90,11 @@ class User(Base, TimestampMixin):
     activity_logs: Mapped[List["ActivityLog"]] = relationship(
         "ActivityLog",
         back_populates="user",
+    )
+    auth_sessions: Mapped[List["AuthSession"]] = relationship(
+        "AuthSession",
+        back_populates="user",
+        cascade="all, delete-orphan",
     )
 
     def __repr__(self) -> str:

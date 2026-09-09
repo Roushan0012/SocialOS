@@ -28,6 +28,7 @@ from app.models.attendance import Attendance
 from app.models.notification import Notification
 from app.models.activity_log import ActivityLog
 from app.models.social_analytics import SocialAnalyticsDaily
+from app.models.auth_session import AuthSession
 
 __all__ = [
     "Base",
@@ -42,7 +43,7 @@ __all__ = [
     "TaskPriority",
     "TaskStatus",
     "AttendanceStatus",
-    # Models (14 tables)
+    # Models (15 tables)
     "Role",
     "User",
     "Company",
@@ -57,4 +58,5 @@ __all__ = [
     "Notification",
     "ActivityLog",
     "SocialAnalyticsDaily",
+    "AuthSession",
 ]

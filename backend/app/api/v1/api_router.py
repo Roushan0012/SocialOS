@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Response, status
 
+from app.api.v1 import auth
 from app.core.config import settings
 from app.core.database import check_database_health
 from app.schemas.health import HealthResponse, DatabaseHealthResponse
 
 api_router = APIRouter()
+api_router.include_router(auth.router)
 
 
 @api_router.get("/healthz", response_model=HealthResponse, tags=["Health"])
