@@ -171,5 +171,9 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_ID: Optional[str] = None
     GOOGLE_CLIENT_SECRET: Optional[str] = None
 
+    # 9. Buffer Integration
+    BUFFER_API_KEY: Optional[str] = None
+    BUFFER_API_URL: str = "https://api.buffer.com"
+
 
 settings = Settings()
