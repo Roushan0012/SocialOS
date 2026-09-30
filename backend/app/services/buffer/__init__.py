@@ -13,17 +13,21 @@ from app.services.buffer.exceptions import (
     BufferMissingApiKeyError,
     BufferTimeoutError,
 )
+from app.services.buffer.publisher import BufferPublisher
 from app.services.buffer.schemas import (
     BufferAccount,
     BufferAccountOverview,
     BufferChannel,
     BufferOrganization,
     BufferOrganizationWithChannels,
+    BufferPostItem,
+    BufferPublishResult,
 )
 from app.services.buffer.sync import BufferSyncService, map_buffer_service_to_platform
 
 __all__ = [
     "BufferClient",
+    "BufferPublisher",
     "BufferSyncService",
     "map_buffer_service_to_platform",
     "BufferAccount",
@@ -31,6 +35,8 @@ __all__ = [
     "BufferChannel",
     "BufferOrganizationWithChannels",
     "BufferAccountOverview",
+    "BufferPostItem",
+    "BufferPublishResult",
     "BufferError",
     "BufferMissingApiKeyError",
     "BufferAuthError",

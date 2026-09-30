@@ -404,3 +404,35 @@ def test_get_channels_query_uses_organization_id_type():
     assert "$organizationId: OrganizationId!" in GET_CHANNELS_QUERY
     assert "$organizationId: ID!" not in GET_CHANNELS_QUERY
 
+
+def test_create_post_mutation_query_structure():
+    """Verify CreatePost mutation declares $input: CreatePostInput! and selects payload union."""
+    from app.services.buffer.client import CREATE_POST_MUTATION
+
+    assert "$input: CreatePostInput!" in CREATE_POST_MUTATION
+    assert "createPost(input: $input)" in CREATE_POST_MUTATION
+    assert "... on PostActionSuccess" in CREATE_POST_MUTATION
+    assert "... on InvalidInputError" in CREATE_POST_MUTATION
+
+
+@pytest.mark.asyncio
+async def test_create_post_client_success(dummy_secret: str):
+    """Verify BufferClient.create_post executes query and extracts createPost data."""
+    mock_payload = {
+        "data": {
+            "createPost": {
+                "__typename": "PostActionSuccess",
+                "post": {"id": "post_123", "status": "buffer", "sharedNow": True},
+            }
+        }
+    }
+
+    mock_transport = httpx.MockTransport(
+        lambda request: httpx.Response(200, json=mock_payload)
+    )
+    async with httpx.AsyncClient(transport=mock_transport) as http_client:
+        client = BufferClient(api_key=dummy_secret, http_client=http_client)
+        result = await client.create_post({"channelId": "ch_1", "mode": "shareNow"})
+        assert result["__typename"] == "PostActionSuccess"
+        assert result["post"]["id"] == "post_123"
+

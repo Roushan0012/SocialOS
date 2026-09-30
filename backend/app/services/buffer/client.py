@@ -58,6 +58,38 @@ query GetChannels($organizationId: OrganizationId!) {
 }
 """.strip()
 
+CREATE_POST_MUTATION = """
+mutation CreatePost($input: CreatePostInput!) {
+  createPost(input: $input) {
+    __typename
+    ... on PostActionSuccess {
+      post {
+        id
+        status
+        sharedNow
+        sentAt
+        createdAt
+      }
+    }
+    ... on NotFoundError {
+      message
+    }
+    ... on UnauthorizedError {
+      message
+    }
+    ... on UnexpectedError {
+      message
+    }
+    ... on LimitReachedError {
+      message
+    }
+    ... on InvalidInputError {
+      message
+    }
+  }
+}
+""".strip()
+
 
 class BufferClient:
     """Client for interacting with Buffer's GraphQL API."""
@@ -307,3 +339,26 @@ class BufferClient:
             account=account,
             organizations_with_channels=organizations_with_channels,
         )
+
+    async def create_post(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute createPost mutation on Buffer GraphQL API.
+
+        Args:
+            input_data: Dictionary conforming to Buffer's CreatePostInput schema.
+
+        Returns:
+            Dictionary containing the raw payload from the createPost mutation.
+
+        Raises:
+            BufferAPIError: If response data is empty or invalid.
+        """
+        response_json = await self._execute_query(
+            query=CREATE_POST_MUTATION,
+            variables={"input": input_data},
+            operation_name="CreatePost",
+        )
+        data = response_json.get("data") or {}
+        create_post_result = data.get("createPost")
+        if not create_post_result:
+            raise BufferAPIError("Buffer createPost mutation returned an empty result.")
+        return create_post_result

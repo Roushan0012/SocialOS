@@ -69,3 +69,13 @@ class PostCreateResponse(BaseModel):
     targets: List[PostTargetRead] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class PostTargetPublishResponse(BaseModel):
+    """Response returned upon post target publish execution."""
+    message: str = "Post target publish operation completed"
+    post_id: uuid.UUID
+    post_status: PostStatus
+    target: PostTargetRead
+
+    model_config = ConfigDict(from_attributes=True)

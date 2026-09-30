@@ -35,6 +35,7 @@ from app.schemas.social import (
 from app.schemas.post import (
     PostCreateRequest,
     PostCreateResponse,
+    PostTargetPublishResponse,
     PostTargetRead,
 )
 
@@ -65,5 +66,6 @@ __all__ = [
     "TokenRefreshResponse",
     "PostCreateRequest",
     "PostCreateResponse",
+    "PostTargetPublishResponse",
     "PostTargetRead",
 ]
