@@ -88,6 +88,18 @@ class SocialAccount(Base, TimestampMixin):
         JSONB().with_variant(JSON(), "sqlite"),
         nullable=True,
     )
+    # Buffer Integration Identifiers
+    buffer_channel_id: Mapped[Optional[str]] = mapped_column(
+        String(255),
+        nullable=True,
+        index=True,
+        unique=True,
+    )
+    buffer_organization_id: Mapped[Optional[str]] = mapped_column(
+        String(255),
+        nullable=True,
+        index=True,
+    )
     last_connected_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True),
         nullable=True,

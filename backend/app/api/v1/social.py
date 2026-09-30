@@ -18,11 +18,14 @@ from app.api.deps import (
 from app.models.enums import Platform
 from app.models.user import User
 from app.schemas.social import (
+    BufferSyncRequest,
+    BufferSyncResponse,
     OAuthCallbackResponse,
     OAuthStartResponse,
     SocialAccountRead,
     TokenRefreshResponse,
 )
+from app.services.buffer import BufferSyncService
 from app.services.social_account_service import SocialAccountService
 
 router = APIRouter(prefix="/social", tags=["Social Media Accounts & OAuth"])
@@ -194,4 +197,29 @@ async def refresh_social_account(
     return TokenRefreshResponse(
         message=f"{account.platform.value} token refreshed successfully",
         account=account,
+    )
+
+
+@router.post(
+    "/accounts/sync",
+    response_model=BufferSyncResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Synchronize Buffer connected channels for an authorized company",
+)
+async def sync_buffer_accounts(
+    data: BufferSyncRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """Synchronize connected Buffer channels into company social_accounts.
+
+    Enforces strict company-level authorization and RBAC. Idempotently creates or
+    updates accounts, preserves historical records, and skips unsupported platforms safely.
+    Zero token exposure guarantee.
+    """
+    return await BufferSyncService.sync_channels_for_company(
+        db=db,
+        company_id=data.company_id,
+        current_user=current_user,
+        organization_id=data.organization_id,
     )

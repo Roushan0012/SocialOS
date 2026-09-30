@@ -23,6 +23,8 @@ class SocialAccountRead(BaseModel):
     account_name: str
     platform_account_id: str
     status: SocialAccountStatus
+    buffer_channel_id: Optional[str] = None
+    buffer_organization_id: Optional[str] = None
     token_expires_at: Optional[datetime] = None
     last_connected_at: Optional[datetime] = None
     created_at: datetime
@@ -48,3 +50,32 @@ class TokenRefreshResponse(BaseModel):
     """Response returned upon successful manual or automated token refresh."""
     message: str = "Social account token refreshed successfully"
     account: SocialAccountRead
+
+
+class BufferSyncRequest(BaseModel):
+    """Request payload to trigger Buffer channel synchronization for an authorized company."""
+    company_id: uuid.UUID = Field(..., description="Target brand company UUID")
+    organization_id: Optional[str] = Field(None, description="Optional Buffer organization ID filter")
+
+
+class SyncAccountSummaryItem(BaseModel):
+    """Summary item for a single channel in synchronization results."""
+    id: Optional[uuid.UUID] = None
+    buffer_channel_id: str
+    name: str
+    platform: Optional[Platform] = None
+    service: Optional[str] = None
+    reason: Optional[str] = None
+    error: Optional[str] = None
+
+
+class BufferSyncResponse(BaseModel):
+    """Response returned upon completion of Buffer channel synchronization."""
+    message: str = "Buffer channels synchronized successfully"
+    company_id: uuid.UUID
+    created: list[SyncAccountSummaryItem] = Field(default_factory=list)
+    updated: list[SyncAccountSummaryItem] = Field(default_factory=list)
+    unchanged: list[SyncAccountSummaryItem] = Field(default_factory=list)
+    skipped: list[SyncAccountSummaryItem] = Field(default_factory=list)
+    errors: list[SyncAccountSummaryItem] = Field(default_factory=list)
+    total_synced: int = 0

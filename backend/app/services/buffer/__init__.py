@@ -20,9 +20,12 @@ from app.services.buffer.schemas import (
     BufferOrganization,
     BufferOrganizationWithChannels,
 )
+from app.services.buffer.sync import BufferSyncService, map_buffer_service_to_platform
 
 __all__ = [
     "BufferClient",
+    "BufferSyncService",
+    "map_buffer_service_to_platform",
     "BufferAccount",
     "BufferOrganization",
     "BufferChannel",
