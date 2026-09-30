@@ -32,6 +32,12 @@ from app.schemas.social import (
     TokenRefreshResponse,
 )
 
+from app.schemas.post import (
+    PostCreateRequest,
+    PostCreateResponse,
+    PostTargetRead,
+)
+
 __all__ = [
     "HealthResponse",
     "DatabaseHealthResponse",
@@ -57,4 +63,7 @@ __all__ = [
     "OAuthStartResponse",
     "OAuthCallbackResponse",
     "TokenRefreshResponse",
+    "PostCreateRequest",
+    "PostCreateResponse",
+    "PostTargetRead",
 ]
